@@ -1,4 +1,4 @@
-const CACHE_NAME = 'climat-v5-2a2f9a58a227';
+const CACHE_NAME = 'climat-v5-a0fc1d12e1d6';
 const BASE = '/Climat-PWA/';
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
@@ -22,6 +22,17 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin || event.request.method !== 'GET' || !url.pathname.startsWith(BASE)) return;
   event.respondWith((async () => {
+    const isNavigation = event.request.mode === 'navigate' || url.pathname === BASE || url.pathname === BASE + 'index.html';
+    if (isNavigation) {
+      try {
+        const fresh = await fetch(event.request, { cache: 'no-store' });
+        if (fresh.ok) (await caches.open(CACHE_NAME)).put(BASE + 'index.html', fresh.clone());
+        return withIsolationHeaders(fresh);
+      } catch {
+        const fallback = await caches.match(BASE + 'index.html') || await caches.match(BASE);
+        return fallback ? withIsolationHeaders(fallback) : Response.error();
+      }
+    }
     const cached = await caches.match(event.request);
     if (cached) return withIsolationHeaders(cached);
     try {

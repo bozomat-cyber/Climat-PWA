@@ -3,24 +3,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#26372f">
+  <meta name="theme-color" content="#E9E5DA">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="CliMat V5">
   <link rel="manifest" href="/Climat-PWA/manifest.webmanifest">
   <link rel="icon" href="/Climat-PWA/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/Climat-PWA/icon-180.png">
   <title>CliMat V5 — Dictionnaires</title>
-  <script type="module" crossorigin src="/Climat-PWA/assets/index-CkgWGYd0.js"></script>
-  <link rel="stylesheet" crossorigin href="/Climat-PWA/assets/index-9kQc8aLr.css">
+  <script type="module" crossorigin src="/Climat-PWA/assets/index-BKPkgdEf.js"></script>
+  <link rel="stylesheet" crossorigin href="/Climat-PWA/assets/index-BoHJNaR8.css">
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" id="brand-home" href="/Climat-PWA/" aria-label="Accueil documentaire CliMat V5">CliMat <span>V5</span></a>
-    <nav class="mainnav" aria-label="Navigation principale">
-      <button class="nav active" type="button" data-app-view="dictionary-view" aria-current="page">Dictionnaires</button>
-      <button class="nav" type="button" data-app-view="pathology-view" aria-current="false">Pathologies</button>
-    </nav>
-    <button id="data-settings" class="icon-button" aria-label="Gestion des données">⚙</button>
+    <button id="app-back" class="toolbar-button" type="button" aria-label="Précédent" disabled>‹</button>
+    <button id="app-forward" class="toolbar-button" type="button" aria-label="Suivant" disabled>›</button>
+    <a class="brand" id="brand-home" href="/Climat-PWA/" aria-label="Accueil et recherche CliMat">
+      <img src="/Climat-PWA/icon.svg" alt="" width="34" height="34"><span class="brand-word">CliMat</span>
+    </a>
+    <button id="global-sources" class="toolbar-button source-toggle" type="button" aria-pressed="false">Sources</button>
+    <button id="data-settings" class="icon-button" aria-label="Paramètres et sauvegardes">⚙</button>
   </header>
   <main>
     <section id="dictionary-view" class="app-view active">
@@ -29,6 +30,7 @@
         <h1>Les dictionnaires CliMat, sur cet appareil.</h1>
         <p>Choisissez un fichier SQLite ou Zstandard depuis l’app Fichiers. Il est contrôlé puis stocké sur cet appareil; son contenu n’est pas envoyé à un serveur.</p>
         <div class="import-actions">
+          <button id="show-pathologies" class="secondary" type="button">Pathologies v0.3</button>
           <button id="choose-data" class="primary">Charger les données CliMat</button>
           <button id="choose-manifest" class="secondary">Ajouter un manifeste SHA-256</button>
         </div>
@@ -55,12 +57,13 @@
             <h1 id="current-dictionary-title">Dictionnaires</h1>
             <p id="database-summary" class="muted"></p>
           </div>
-          <button id="replace-data" class="secondary">Remplacer la base</button>
+          <div class="workspace-tools"><button id="replace-data" class="secondary">Remplacer la base</button></div>
         </div>
         <div class="searchbar">
           <label class="search-field"><span aria-hidden="true">⌕</span><input id="search-input" type="search" placeholder="Rechercher un titre ou un texte…" autocomplete="off"></label>
           <select id="dictionary-filter" aria-label="Filtrer par dictionnaire"><option value="">Tous les dictionnaires</option></select>
           <button id="favorites-toggle" class="secondary">☆ Favoris</button>
+          <button id="recent-toggle" class="secondary" type="button">Récentes</button>
         </div>
         <p id="entry-message" class="message" role="status" aria-live="polite"></p>
         <div class="workspace-layout">
@@ -85,7 +88,7 @@
         <label class="pathology-search"><span aria-hidden="true">⌕</span><input id="pathology-search" type="search" placeholder="Intitulé officiel ou synonyme vérifié…" autocomplete="off" aria-label="Rechercher une pathologie"></label>
         <label class="pathology-id-label">Ouvrir par ID <input id="pathology-id" type="number" min="1710" max="2734" inputmode="numeric" placeholder="ID"></label>
         <button id="pathology-open-id" class="secondary" type="button">Ouvrir</button>
-        <button id="pathology-sources" class="secondary" type="button" aria-pressed="true">Sources ON</button>
+        <button id="pathology-sources" class="secondary" type="button" aria-pressed="false" hidden>Sources OFF</button>
       </div>
       <p id="pathology-status" class="pathology-status" role="status" aria-live="polite">Chargement du paquet documentaire…</p>
       <div class="pathology-layout">
@@ -107,10 +110,12 @@
         <p>Le diagnostic recherche/relations est généré localement à partir de la base active. Il ne transmet ni fiche ni donnée à un serveur.</p>
         <p id="app-build-info" class="small-note">Version interface en cours de vérification…</p>
         <p class="small-note">Recharger l’interface applique la dernière version sans effacer la base documentaire, les favoris ou les notes.</p>
-        <div class="dialog-actions"><button id="reload-app" class="secondary" type="button">Recharger l’interface</button><button id="dialog-import" class="primary" type="button">Remplacer la base documentaire</button><button id="restore-previous" class="secondary" type="button" hidden>Restaurer la base précédente</button><button id="delete-documentary" class="danger-button" type="button">Supprimer la base documentaire</button><button id="clean-temp" class="secondary" type="button">Nettoyer les fichiers temporaires</button><button id="run-full-integrity" class="secondary" type="button" hidden>Contrôle SQLite complet facultatif</button><button id="export-search-relations-diagnostic" class="secondary" type="button">Exporter le diagnostic recherche et relations</button><button id="export-notes" class="secondary" type="button">Exporter les données personnelles</button><button id="restore-notes" class="secondary" type="button">Restaurer les données personnelles</button><button id="erase-all" class="danger-button" type="button">Effacer les données locales CliMat V5</button><input id="personal-backup-file" type="file" accept="application/json,.json" hidden></div>
+        <p class="small-note">Cette sauvegarde porte sur les personnalisations, favoris, notes et historique récents. Elle n’exporte pas la base SQLite complète de plusieurs gigaoctets.</p>
+        <section class="reader-preferences"><h3>Lecture</h3><label for="font-size-pref">Taille du texte <output id="font-size-label"></output></label><input id="font-size-pref" type="range" min="90" max="140" step="5"><p>Les interprétations symboliques sont des pistes documentaires et ne remplacent pas un avis ni un traitement médical.</p></section>
+        <div class="dialog-actions"><button id="reload-app" class="secondary" type="button">Recharger l’interface</button><button id="dialog-import" class="primary" type="button">Remplacer la base documentaire</button><button id="restore-previous" class="secondary" type="button" hidden>Restaurer la base précédente</button><button id="delete-documentary" class="danger-button" type="button">Supprimer la base documentaire</button><button id="clean-temp" class="secondary" type="button">Nettoyer les fichiers temporaires</button><button id="run-full-integrity" class="secondary" type="button" hidden>Contrôle SQLite complet facultatif</button><button id="export-search-relations-diagnostic" class="secondary" type="button">Exporter le diagnostic recherche et relations</button><button id="export-notes" class="secondary" type="button">Exporter sauvegarde personnelle</button><button id="restore-notes" class="secondary" type="button">Importer une sauvegarde personnelle</button><button id="clear-local-lists" class="secondary" type="button">Effacer favoris et historique récent</button><button id="erase-all" class="danger-button" type="button">Effacer les données locales CliMat V5</button><input id="personal-backup-file" type="file" accept="application/json,.json" hidden></div>
       </form>
     </dialog>
   </main>
-  <footer><span>Base documentaire en lecture seule • aucun envoi de données</span><button id="export-import-diagnostic" class="footer-action" type="button" hidden>Exporter le diagnostic d’import</button><span id="offline-status">Mode local prêt</span></footer>
+  <footer><span>Base documentaire d’origine préservée • données personnelles locales</span><span id="footer-build">Interface en cours de vérification</span><button id="export-import-diagnostic" class="footer-action" type="button" hidden>Exporter le diagnostic d’import</button><span id="offline-status">Mode local prêt</span></footer>
 </body>
 </html>
