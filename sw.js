@@ -1,4 +1,4 @@
-const CACHE_NAME = 'climat-v5-b8d2518f3214';
+const CACHE_NAME = 'climat-v5-2a2f9a58a227';
 const BASE = '/Climat-PWA/';
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
@@ -23,13 +23,21 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin || event.request.method !== 'GET' || !url.pathname.startsWith(BASE)) return;
   event.respondWith((async () => {
     const cached = await caches.match(event.request);
-    if (cached) return cached;
+    if (cached) return withIsolationHeaders(cached);
     try {
       const response = await fetch(event.request);
       if (response.ok) (await caches.open(CACHE_NAME)).put(event.request, response.clone());
-      return response;
+      return withIsolationHeaders(response);
     } catch {
-      return (await caches.match(BASE + 'index.html')) || Response.error();
+      const fallback = await caches.match(BASE + 'index.html');
+      return fallback ? withIsolationHeaders(fallback) : Response.error();
     }
   })());
 });
+
+function withIsolationHeaders(response) {
+  const headers = new Headers(response.headers);
+  headers.set('Cross-Origin-Opener-Policy', 'same-origin');
+  headers.set('Cross-Origin-Embedder-Policy', 'require-corp');
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+}
