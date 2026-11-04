@@ -1,22 +1,21 @@
 # CliMat V5 — PWA
 
-Distribution compilée de CliMat V5, hébergée par GitHub Pages.
+Version compilée de CliMat V5, publiée gratuitement avec GitHub Pages :
 
-- URL : https://bozomat-cyber.github.io/Climat-PWA/
-- Les ressources documentaires v0.3 sont incluses en fichiers compressés par fragments.
-- Les archives SQLite ne sont pas incluses. L’import SQLite se fait localement depuis l’app Fichiers.
-- Aucun corpus source de provenance n’est distribué.
+**https://bozomat-cyber.github.io/Climat-PWA/**
+
+Cette distribution contient l’interface, les ressources du paquet documentaire v0.3 et le moteur SQLite WebAssembly. Elle ne contient pas d’archive SQLite ni de fichier de provenance interne.
 
 ## Installer sur iPhone
 
-Ouvrir l’URL dans Safari, toucher **Partager**, puis **Sur l’écran d’accueil**. Lancer l’icône une première fois avec Internet pour installer les ressources hors ligne.
+Ouvrir le lien dans Safari, toucher **Partager**, puis **Sur l’écran d’accueil**. Lancer l’icône une première fois avec Internet pour installer les ressources hors ligne.
 
-## Import SQLite local
+## Importer la base SQLite
 
-Dans l’application, choisir **Charger les données CliMat**, puis sélectionner l’archive `.zst` dans Fichiers. L’application vérifie le manifeste et l’empreinte avant d’activer une base. L’archive n’est pas envoyée ni hébergée ici. L’import complet OPFS doit encore être confirmé sur un iPhone réel pour cette publication.
+Dans l’application, choisir **Charger les données CliMat**, puis sélectionner l’archive `.zst` depuis Fichiers. L’application vérifie le manifeste et les empreintes avant d’activer la base. Le fichier est traité sur l’appareil et n’est pas envoyé à un serveur.
+
+Le contrôle automatisé de l’import est passé. Le transfert OPFS complet reste à confirmer sur un iPhone physique.
 
 ## Publication
 
-Le dépôt contient uniquement la sortie compilée. La publication est déclenchée par push sur `main` via GitHub Actions et Pages. Les mises à jour applicatives doivent être compilées depuis le dépôt privé, contrôlées, puis remplacer les fichiers de distribution dans ce dépôt.
-
-La source utilisée est `bozomat-cyber/Climat`, branche `climat-v5-sqlite-pathologies-v03`, commit `440fc3b18ce61d778aad32ab5ce9d1dc444aaee3`, avec adaptation du préfixe URL `/Climat-PWA/`.
+Le dépôt ne contient que la sortie compilée et ce workflow de publication statique. La source utilisée est `bozomat-cyber/Climat`, branche `climat-v5-sqlite-pathologies-v03`, commit `440fc3b18ce61d778aad32ab5ce9d1dc444aaee3`. La compilation cible le préfixe GitHub Pages `/Climat-PWA/`.

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#26372f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="CliMat V5">
+  <link rel="manifest" href="/Climat-PWA/manifest.webmanifest">
+  <link rel="icon" href="/Climat-PWA/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/Climat-PWA/icon-180.png">
+  <title>CliMat V5 — Dictionnaires</title>
+  <script type="module" crossorigin src="/Climat-PWA/assets/index-DUz7j2jK.js"></script>
+  <link rel="stylesheet" crossorigin href="/Climat-PWA/assets/index-9kQc8aLr.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" id="brand-home" href="/Climat-PWA/" aria-label="Accueil documentaire CliMat V5">CliMat <span>V5</span></a>
+    <nav class="mainnav" aria-label="Navigation principale">
+      <button class="nav active" type="button" data-app-view="dictionary-view" aria-current="page">Dictionnaires</button>
+      <button class="nav" type="button" data-app-view="pathology-view" aria-current="false">Pathologies</button>
+    </nav>
+    <button id="data-settings" class="icon-button" aria-label="Gestion des données">⚙</button>
+  </header>
+  <main>
+    <section id="dictionary-view" class="app-view active">
+      <section id="welcome" class="welcome card">
+        <span class="eyebrow">BASE DOCUMENTAIRE LOCALE</span>
+        <h1>Les dictionnaires CliMat, sur cet appareil.</h1>
+        <p>Choisissez un fichier SQLite ou Zstandard depuis l’app Fichiers. Il est contrôlé puis stocké sur cet appareil; son contenu n’est pas envoyé à un serveur.</p>
+        <div class="import-actions">
+          <button id="choose-data" class="primary">Charger les données CliMat</button>
+          <button id="choose-manifest" class="secondary">Ajouter un manifeste SHA-256</button>
+        </div>
+        <input id="data-file" type="file" accept=".sqlite,.db,.climatdecodage,.zst" hidden>
+        <input id="manifest-file" type="file" accept=".json,.sha256,.txt" hidden>
+        <p class="small-note">La référence courante CliMat V5 du 29/10/2026 fait 3 890 319 360 octets décompressés. L’application vérifie les empreintes réelles, le schéma, les index, les effectifs et les requêtes documentaires. La référence historique J505 reste importable; aucun réimport ne démarre automatiquement.</p>
+        <p id="app-message" class="message" role="status" aria-live="polite"></p>
+      </section>
+      <div id="import-progress" class="progress-area" hidden>
+        <progress id="progress-bar" max="100" value="0"></progress>
+        <span id="progress-text" aria-live="polite"></span>
+      </div>
+      <section id="sqlite-integrity-progress" class="sqlite-integrity-progress" hidden aria-live="polite" aria-atomic="true">
+        <h2>Vérification de l’intégrité de la base SQLite</h2>
+        <progress id="sqlite-integrity-bar" aria-label="Vérification SQLite en cours"></progress>
+        <div class="sqlite-integrity-status"><span class="sqlite-integrity-indicator" aria-hidden="true"></span><strong id="sqlite-integrity-state">Contrôle non démarré.</strong><time id="sqlite-integrity-elapsed">Durée : 00:00</time></div>
+        <p id="sqlite-integrity-activity">Le pourcentage n’est pas disponible pour ce contrôle.</p>
+        <p id="sqlite-integrity-error" class="sqlite-integrity-error" role="alert" hidden></p><button id="cancel-full-integrity" class="danger-button" type="button" hidden>Annuler le contrôle de maintenance</button>
+      </section>
+      <section id="dictionary-workspace" hidden>
+        <div class="workspace-heading">
+          <div>
+            <p class="eyebrow">CONSULTATION HORS CONNEXION</p>
+            <h1 id="current-dictionary-title">Dictionnaires</h1>
+            <p id="database-summary" class="muted"></p>
+          </div>
+          <button id="replace-data" class="secondary">Remplacer la base</button>
+        </div>
+        <div class="searchbar">
+          <label class="search-field"><span aria-hidden="true">⌕</span><input id="search-input" type="search" placeholder="Rechercher un titre ou un texte…" autocomplete="off"></label>
+          <select id="dictionary-filter" aria-label="Filtrer par dictionnaire"><option value="">Tous les dictionnaires</option></select>
+          <button id="favorites-toggle" class="secondary">☆ Favoris</button>
+        </div>
+        <p id="entry-message" class="message" role="status" aria-live="polite"></p>
+        <div class="workspace-layout">
+          <div class="dictionary-navigation">
+            <aside id="dictionary-list" class="dictionary-list" aria-label="Dictionnaires"></aside>
+            <small class="dictionary-scroll-hint" aria-hidden="true">Glissez pour parcourir les dictionnaires&nbsp;↔</small>
+          </div>
+          <section class="results-panel" aria-label="Résultats">
+            <div class="results-heading"><span id="results-count">Choisissez un dictionnaire ou recherchez.</span><button id="more-results" class="text-button" hidden>Afficher plus</button></div>
+            <div id="results-list" class="results-list"></div>
+          </section>
+          <article id="entry-detail" class="entry-detail"><div class="empty-state">Ouvrez une fiche pour la consulter.</div></article>
+        </div>
+      </section>
+    </section>
+    <section id="pathology-view" class="app-view pathology-view">
+      <header class="pathology-page-head">
+        <div><p class="eyebrow">PAQUET DOCUMENTAIRE V0.3 · PROTOCOLE V1.2</p><h1>Pathologies</h1><p class="muted">Consultation indépendante de l’import SQLite. Les récits restent anonymisés.</p></div>
+        <button id="pathology-install" class="secondary" type="button">Installer les données documentaires</button>
+      </header>
+      <div class="pathology-toolbar">
+        <label class="pathology-search"><span aria-hidden="true">⌕</span><input id="pathology-search" type="search" placeholder="Intitulé officiel ou synonyme vérifié…" autocomplete="off" aria-label="Rechercher une pathologie"></label>
+        <label class="pathology-id-label">Ouvrir par ID <input id="pathology-id" type="number" min="1710" max="2734" inputmode="numeric" placeholder="ID"></label>
+        <button id="pathology-open-id" class="secondary" type="button">Ouvrir</button>
+        <button id="pathology-sources" class="secondary" type="button" aria-pressed="true">Sources ON</button>
+      </div>
+      <p id="pathology-status" class="pathology-status" role="status" aria-live="polite">Chargement du paquet documentaire…</p>
+      <div class="pathology-layout">
+        <aside class="pathology-result-panel" aria-label="Résultats de recherche"><p id="pathology-result-count">Entrez un terme de recherche.</p><div id="pathology-results"></div></aside>
+        <article id="pathology-entry" class="pathology-entry"><div class="empty-state">Recherchez un intitulé, un synonyme vérifié ou ouvrez une fiche par ID.</div></article>
+      </div>
+    </section>
+    <dialog id="data-dialog">
+      <form method="dialog">
+        <button class="close-button" aria-label="Fermer">×</button>
+        <a class="dialog-home" id="dialog-brand-home" href="/Climat-PWA/" aria-label="Retour à la recherche CliMat V5">CliMat <span>V5</span> · Retour à la recherche</a>
+        <h2>Données de l’appareil</h2>
+        <p id="storage-summary">Stockage local non mesuré.</p>
+        <p id="active-base-summary">Aucune base active.</p>
+        <div id="storage-breakdown" class="storage-breakdown"></div>
+        <details class="storage-history"><summary>Journal des opérations de stockage</summary><ul id="storage-log"><li>Aucune opération enregistrée.</li></ul></details>
+        <p>CliMat V5 est une application documentaire : elle ne propose pas de gestion de clients ou de rendez-vous. Les données personnelles V5 restent séparées des bases documentaires.</p>
+        <p>Les estimations du navigateur peuvent être arrondies ou incomplètes et ne constituent pas la capacité libre exacte de l’appareil.</p>
+        <p>Le diagnostic recherche/relations est généré localement à partir de la base active. Il ne transmet ni fiche ni donnée à un serveur.</p>
+        <p id="app-build-info" class="small-note">Version interface en cours de vérification…</p>
+        <p class="small-note">Recharger l’interface applique la dernière version sans effacer la base documentaire, les favoris ou les notes.</p>
+        <div class="dialog-actions"><button id="reload-app" class="secondary" type="button">Recharger l’interface</button><button id="dialog-import" class="primary" type="button">Remplacer la base documentaire</button><button id="restore-previous" class="secondary" type="button" hidden>Restaurer la base précédente</button><button id="delete-documentary" class="danger-button" type="button">Supprimer la base documentaire</button><button id="clean-temp" class="secondary" type="button">Nettoyer les fichiers temporaires</button><button id="run-full-integrity" class="secondary" type="button" hidden>Contrôle SQLite complet facultatif</button><button id="export-search-relations-diagnostic" class="secondary" type="button">Exporter le diagnostic recherche et relations</button><button id="export-notes" class="secondary" type="button">Exporter les données personnelles</button><button id="restore-notes" class="secondary" type="button">Restaurer les données personnelles</button><button id="erase-all" class="danger-button" type="button">Effacer les données locales CliMat V5</button><input id="personal-backup-file" type="file" accept="application/json,.json" hidden></div>
+      </form>
+    </dialog>
+  </main>
+  <footer><span>Base documentaire en lecture seule • aucun envoi de données</span><button id="export-import-diagnostic" class="footer-action" type="button" hidden>Exporter le diagnostic d’import</button><span id="offline-status">Mode local prêt</span></footer>
+</body>
+</html>
