@@ -1,4 +1,4 @@
-const CACHE_NAME = 'climat-v5-wasm-recovery-188679e98a80';
+const CACHE_NAME = 'climat-v5-wasm-recovery-188679e98a80-fix1';
 const BASE = '/Climat-PWA/';
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
@@ -58,7 +58,7 @@ self.addEventListener('fetch', (event) => {
 
 async function isValidWasmResponse(response) {
   if (!response.ok || !/^application\/wasm(?:\s*;|$)/i.test(response.headers.get('content-type') || '')) return false;
-  const buffer = await response.arrayBuffer();
+  const buffer = new Uint8Array(await response.arrayBuffer());
   return buffer.byteLength >= 4 && buffer[0] === 0x00 && buffer[1] === 0x61 && buffer[2] === 0x73 && buffer[3] === 0x6d;
 }
 
