@@ -1,4 +1,4 @@
-const CACHE_NAME = 'climat-v5-e42b7c5f87dc';
+const CACHE_NAME = 'climat-v5-wasm-recovery-20261104';
 const BASE = '/Climat-PWA/';
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
@@ -8,6 +8,12 @@ self.addEventListener('install', (event) => {
     const cache = await caches.open(CACHE_NAME);
       const urls = [...new Set([BASE, BASE + 'index.html', BASE + 'manifest.webmanifest', BASE + 'sw.js', ...assets.map((name) => BASE + name)])];
       await cache.addAll(urls);
+    const wasmAssets = assets.filter((name) => name.endsWith('.wasm'));
+    if (!wasmAssets.length) throw new Error('WASM asset missing from precache manifest');
+    for (const name of wasmAssets) {
+      const wasm = await cache.match(BASE + name);
+      if (!wasm || !(await isValidWasmResponse(wasm))) throw new Error('Invalid WebAssembly asset in precache: ' + name);
+    }
     await self.skipWaiting();
   })());
 });
@@ -34,17 +40,27 @@ self.addEventListener('fetch', (event) => {
       }
     }
     const cached = await caches.match(event.request);
-    if (cached) return withIsolationHeaders(cached);
+    if (cached) {
+      if (url.pathname.endsWith('.wasm') && !(await isValidWasmResponse(cached.clone()))) return Response.error();
+      return withIsolationHeaders(cached);
+    }
     try {
       const response = await fetch(event.request);
+      if (url.pathname.endsWith('.wasm') && !(await isValidWasmResponse(response.clone()))) return Response.error();
       if (response.ok) (await caches.open(CACHE_NAME)).put(event.request, response.clone());
       return withIsolationHeaders(response);
     } catch {
-      const fallback = await caches.match(BASE + 'index.html');
-      return fallback ? withIsolationHeaders(fallback) : Response.error();
+      // Never return the HTML shell for a missing script, database or WebAssembly asset.
+      return Response.error();
     }
   })());
 });
+
+async function isValidWasmResponse(response) {
+  if (!response.ok || !/^application\/wasm(?:\s*;|$)/i.test(response.headers.get('content-type') || '')) return false;
+  const buffer = await response.arrayBuffer();
+  return buffer.byteLength >= 4 && buffer[0] === 0x00 && buffer[1] === 0x61 && buffer[2] === 0x73 && buffer[3] === 0x6d;
+}
 
 function withIsolationHeaders(response) {
   const headers = new Headers(response.headers);
