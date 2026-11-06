@@ -1,4 +1,4 @@
-const CACHE_NAME = 'climat-v5-72726cc30c91';
+const CACHE_NAME = 'climat-v5-8af6d57bc7ce';
 const BASE = '/Climat-PWA/';
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
